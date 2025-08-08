@@ -3,20 +3,20 @@
 ## Project Setup Tasks
 
 ### Backend Setup
-- [ ] Create `backend/` directory structure
-- [ ] Initialize `backend/package.json` with Fastify dependencies
+- [X] Create `backend/` directory structure
+- [X] Initialize `backend/package.json` with Fastify dependencies
 - [ ] Create `backend/server.js` with basic Fastify server setup
 - [ ] Add WebSocket support to backend server
-- [ ] Create `backend/src/` directory structure
-- [ ] Set up `backend/src/routes/` directory for API routes
-- [ ] Set up `backend/src/services/` directory for business logic
-- [ ] Set up `backend/src/ml/` directory for ML modules
-- [ ] Set up `backend/src/game/` directory for game state
+- [X] Create `backend/src/` directory structure
+- [X] Set up `backend/src/routes/` directory for API routes
+- [X] Set up `backend/src/services/` directory for business logic
+- [X] Set up `backend/src/ml/` directory for ML modules
+- [X] Set up `backend/src/game/` directory for game state
 - [ ] Create basic health check endpoint (`GET /health`)
 - [ ] Add CORS configuration to backend server
 - [ ] Set up environment variables for backend configuration
 - [ ] Create `backend/.env.example` file
-- [ ] Add `backend/.env` to `.gitignore`
+- [X] Add `backend/.env` to `.gitignore`
 
 ### Frontend Setup
 - [ ] Create `frontend/` directory structure
@@ -43,10 +43,10 @@
 - [ ] Create root `package.json` with workspace configuration
 - [ ] Set up development scripts in root `package.json`
 - [ ] Configure hot reload for development
-- [ ] Set up linting configuration (ESLint)
-- [ ] Set up code formatting (Prettier)
-- [ ] Create `.gitignore` for Node.js files
-- [ ] Set up testing framework (Jest)
+- [X] Set up linting configuration (ESLint)
+- [X] Set up code formatting (Prettier)
+- [X] Create `.gitignore` for Node.js files
+- [X] Set up testing framework (Jest)
 - [ ] Create basic test configuration
 
 ## Backend Implementation Tasks

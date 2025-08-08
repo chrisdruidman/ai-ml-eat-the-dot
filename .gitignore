@@ -129,13 +129,15 @@ frontend/.cache/
 *.h5
 *.pkl
 *.joblib
-*.json
 models/
 data/
 datasets/
 *.csv
-*.json
 *.parquet
+# Exclude data JSON files but not config files
+data/*.json
+models/*.json
+datasets/*.json
 
 # Training artifacts
 checkpoints/
