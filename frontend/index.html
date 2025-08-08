@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Eat the Dot — Viewer</title>
+    <style>body,html,#app{margin:0;padding:0;width:100%;height:100%;background:#0b0e13;color:#eee;font-family:sans-serif}#hud{position:fixed;top:8px;left:8px;background:#1118;padding:8px 12px;border-radius:8px}button{margin-right:8px}</style>
+  </head>
+  <body>
+    <div id="hud">
+      <button id="replay">Replay</button>
+      <span id="status">disconnected</span>
+    </div>
+    <div id="app"></div>
+    <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+    <script type="module" src="/src/viewer.js"></script>
+  </body>
+</html>

@@ -1,201 +1,48 @@
-# AI/ML Eat the Dot
+# AI/ML Eat the Dot — MVP
 
-A machine learning learning project that presents ML agents in a game-like 3D environment. This project uses Fastify for the backend API and Three.js for the 3D game frontend.
+**Goal:** From a clean clone, train a tabular Q-learning agent that reliably reaches the dot on a 10×10 grid (mean return ≥ 0.7 over the last 100 episodes) in ≤ 10 minutes on CPU, and replay the learned policy in a minimal Three.js viewer.
 
-## 🎯 Project Overview
+## Environment spec
+- **Grid:** width=10, height=10; free space only (no walls for MVP).
+- **Action space:** {0: up, 1: right, 2: down, 3: left}.
+- **Observation:** `(ax, ay, dx, dy)` where `a` is agent, `d` is dot; integers in `[0, width-1]`.
+- **Episode end:** when dot reached or `maxSteps=200`.
+- **Rewards:** `+1` when dot reached; `-0.01` per step; no wall penalty in MVP.
+- **Determinism:** seedable RNG; `reset(seed)` and CLI `--seed` to reproduce trajectories.
 
-This project is designed to help learn machine learning concepts through interactive visualization. ML agents will be trained to navigate and interact in a 3D game world, with the backend handling the ML processing and the frontend providing real-time visualization.
-
-## 🏗️ Architecture
-
-- **Backend**: Fastify (Node.js) - Handles ML processing, agent training, and game state management
-- **Frontend**: Three.js - 3D game environment for visualizing ML agent behavior
-- **Communication**: WebSocket for real-time updates between backend and frontend
-- **ML Framework**: TensorFlow.js for machine learning algorithms
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js (version 18 or higher)
-- npm or yarn package manager
-
-### Installation
-
-1. Clone the repository:
+## Quickstart
 ```bash
-git clone <repository-url>
-cd ai-ml-eat-the-dot
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Start the development server:
-```bash
-npm run dev
-```
-
-The application will be available at `http://localhost:3000`
-
-## 📁 Project Structure
-
-```
-ai-ml-eat-the-dot/
-├── backend/                 # Fastify server
-│   ├── src/
-│   │   ├── routes/         # API routes
-│   │   ├── services/       # Business logic
-│   │   ├── ml/            # Machine learning modules
-│   │   └── game/          # Game state management
-│   ├── package.json
-│   └── server.js
-├── frontend/               # Three.js client
-│   ├── src/
-│   │   ├── components/    # React components
-│   │   ├── game/         # Three.js game logic
-│   │   ├── ml/           # ML visualization
-│   │   └── utils/        # Utility functions
-│   ├── package.json
-│   └── index.html
-├── shared/                # Shared types and utilities
-├── package.json
-└── README.md
-```
-
-## 🎮 Features
-
-### Core Features
-- **3D Game Environment**: Interactive 3D world built with Three.js
-- **ML Agent Training**: Backend handles agent training and decision making
-- **Real-time Visualization**: Live updates of agent behavior and training progress
-- **Multiple ML Algorithms**: Support for different ML approaches (reinforcement learning, neural networks, etc.)
-- **Interactive Controls**: User controls for training parameters and visualization options
-
-### Planned Features
-- **Multiple Agent Types**: Different ML algorithms competing in the same environment
-- **Training Metrics**: Real-time visualization of training progress and performance
-- **Custom Environments**: Ability to create different game scenarios
-- **Export/Import**: Save and load trained models
-- **Performance Analytics**: Detailed analysis of agent performance
-
-## 🧠 Machine Learning Components
-
-### Backend ML Services
-- **Agent Training**: Reinforcement learning algorithms
-- **Model Management**: Save/load trained models
-- **Environment Simulation**: Game state management and physics
-- **Performance Tracking**: Training metrics and analytics
-
-### Frontend ML Visualization
-- **Agent Behavior**: Real-time visualization of agent decisions
-- **Training Progress**: Live charts and metrics
-- **Environment Interaction**: Visual feedback for agent actions
-- **Parameter Controls**: Interactive training parameter adjustment
-
-## 🛠️ Development
-
-### Backend Development
-```bash
+# 1) Backend (train + serve replay)
 cd backend
-npm run dev          # Start development server
-npm run test         # Run tests
-npm run build        # Build for production
+npm i
+npm run train        # trains Q-learning and writes CSV + trajectory JSON
+npm start            # starts Fastify on :3000 and WS on /ws
+
+# 2) Frontend (static viewer)
+cd ../frontend
+npm i
+npm start            # serves index.html on :5173 (Vite dev server)
 ```
 
-### Frontend Development
+### Train options
 ```bash
-cd frontend
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run test         # Run tests
+node src/cli/train.js --episodes=10000 --seed=123 --grid=10x10 --maxSteps=200 \\
+  --alpha=0.2 --gamma=0.99 --epsStart=1.0 --epsEnd=0.05 --epsDecay=5000
 ```
+Outputs:
+- `data/logs/returns-<timestamp>.csv` (episode, return, epsilon)
+- `data/trajectories/ep-<n>-<timestamp>.json` (state/action/reward stream)
 
-### Full Stack Development
-```bash
-npm run dev          # Start both backend and frontend
-npm run build        # Build both applications
-npm run test         # Run all tests
-```
-
-## 📊 API Documentation
-
-### WebSocket Events
-- `agent:update` - Agent position and state updates
-- `training:progress` - Training metrics and progress
-- `environment:change` - Environment state changes
-- `model:save` - Model save/load operations
-
-### REST API Endpoints
-- `GET /api/agents` - Get all agents
-- `POST /api/agents` - Create new agent
-- `GET /api/agents/:id` - Get agent details
-- `PUT /api/agents/:id/train` - Start training agent
-- `GET /api/models` - Get saved models
-- `POST /api/models` - Save model
-- `GET /api/environment` - Get environment state
-
-## 🧪 Testing
+### Replay a trajectory
+1. Copy a trajectory filename printed at end of train.
+2. `POST /run/replay` with `{ "file": "ep-123-2025-08-08T20-55-12.json" }`.
+3. Open the viewer; it connects to `ws://localhost:3000/ws` and renders ticks.
 
 ```bash
-# Run all tests
-npm test
-
-# Run backend tests only
-cd backend && npm test
-
-# Run frontend tests only
-cd frontend && npm test
-
-# Run tests with coverage
-npm run test:coverage
+curl -X POST http://localhost:3000/run/replay \\
+  -H 'content-type: application/json' \\
+  -d '{"file":"ep-123-2025-08-08T20-55-12.json"}'
 ```
 
-## 🚀 Deployment
-
-### Development
-```bash
-npm run dev
-```
-
-### Production
-```bash
-npm run build
-npm start
-```
-
-### Docker
-```bash
-docker build -t ai-ml-eat-the-dot .
-docker run -p 3000:3000 ai-ml-eat-the-dot
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🎯 Learning Goals
-
-This project is designed to help learn:
-- **Machine Learning**: Reinforcement learning, neural networks, training algorithms
-- **3D Graphics**: Three.js, WebGL, 3D game development
-- **Real-time Systems**: WebSocket communication, live data visualization
-- **Full-stack Development**: Node.js, Fastify, modern JavaScript/TypeScript
-- **Software Architecture**: Microservices, API design, state management
-
-## 📚 Resources
-
-- [Fastify Documentation](https://www.fastify.io/docs/)
-- [Three.js Documentation](https://threejs.org/docs/)
-- [TensorFlow.js Documentation](https://www.tensorflow.org/js)
-- [WebSocket API](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) 
+## Why tabular first?
+Simplest possible loop to verify rewards, termination, determinism, and the I/O that the viewer needs. DQN/TF.js can be added after MVP.
